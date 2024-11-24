@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
+/*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 17:38:42 by nsiefert          #+#    #+#             */
-/*   Updated: 2023/12/19 20:38:27 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/11/18 20:18:33 by nate             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/libft.h"
+#include "libft.h"
 
 static int	count_words(const char *str, char sep)
 {
@@ -74,12 +74,12 @@ static char	**ext_w(char **words_array, const char *str, char sep, int size)
 	return (words_array);
 }
 
-char	**ft_split(char const *s, char c)
+char	**ft_split(char const *source, char c)
 {
 	int		size;
 	char	**words_array;
 
-	size = count_words(s, c);
+	size = count_words(source, c);
 	words_array = (char **)malloc(sizeof(char *) * (size + 1));
 	if (!words_array)
 		return (NULL);
@@ -88,6 +88,6 @@ char	**ft_split(char const *s, char c)
 		words_array[0] = NULL;
 		return (words_array);
 	}
-	words_array = ext_w(words_array, s, c, size);
+	words_array = ext_w(words_array, source, c, size);
 	return (words_array);
 }

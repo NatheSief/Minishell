@@ -6,7 +6,7 @@
 /*   By: Nathe <nsiefert@student.42.fr>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 18:13:42 by Nathe             #+#    #+#             */
-/*   Updated: 2024/11/13 18:58:50 by Nathe            ###   ########.fr       */
+/*   Updated: 2024/11/18 11:37:01 by Nathe            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,5 +14,11 @@
 
 int	ft_export(t_shell *shell, t_cmd *cmd)
 {
-	ft_lstadd_back();
+	t_list	*new;
+
+	new = ft_lstnew(cmd->cmd[3]);
+	if (!new)
+		return (1);
+	ft_lstadd_back(&shell->head, ft_lstnew(cmd->cmd[3]));
+	return (0);	
 }
