@@ -6,12 +6,13 @@
 /*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:01:02 by nate              #+#    #+#             */
-/*   Updated: 2024/11/13 17:52:27 by Nathe            ###   ########.fr       */
+/*   Updated: 2024/11/18 19:44:54 by nate             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+//	Find if the command is a builtin;
 int execute_builtin(t_cmd *cmd, t_shell *shell) 
 {
 	char **args ;
@@ -34,43 +35,33 @@ int execute_builtin(t_cmd *cmd, t_shell *shell)
 	return (-1);
 }
 
+//	Execute the command with execve if it's not a builtin or if I don't handle the 
+//		options of this builtin
 void execute_command(t_cmd *cmd, t_shell *shell) 
 {
-	char *path ;
-	char **args ;
+	char	*path ;
+	char	**env;
 
-	args = ft_ms_split(cmd);
-	if (!args)
+	env = convert_list_tab(shell->env);
+	if (!env)
 	{
 		perror("malloc");
 		exit(EXIT_FAILURE);
 	}
-	path = get_cmd(args[0]);
-	if (execve(path, args, shell->env) == -1) 
+	path = get_cmd(shell, cmd->cmd[0]);
+	if (!path)
+	{
+		perror("path");
+		free_tab(env);
+		exit(EXIT_FAILURE);
+	}
+	if (execve(path, cmd->cmd[2], env) == -1) 
 	{
 		perror("execve");
-		free(args);
+		free_tab(env);
 		free(path);
 		exit(EXIT_FAILURE);
 	}
-}
-
-void create_pipe(int fd[2]) 
-{
-	if (pipe(fd) == -1) {
-		perror("pipe");
-		exit(EXIT_FAILURE);
-	}
-}
-
-pid_t fork_process() 
-{
-	pid_t pid = fork();
-	if (pid == -1) {
-		perror("fork");
-		exit(EXIT_FAILURE);
-	}
-	return (pid);
 }
 
 void exec_child_process(t_cmd *current, int input_fd, int fd[2], t_shell *shell) 
@@ -85,14 +76,13 @@ void exec_child_process(t_cmd *current, int input_fd, int fd[2], t_shell *shell)
 		dup2(fd[1], STDOUT_FILENO);
 	close(fd[0]);
 	close(fd[1]);
-	if (shell->ret_value)
-		exit(EXIT_FAILURE);
 	if (execute_builtin(current, shell) == -1) 
 		execute_command(current, shell);
 	exit(EXIT_SUCCESS);
 }
 
-void exec_parent_process(pid_t pid, int fd[2], int *input_fd, t_cmd *current, t_shell *shell) 
+void exec_parent_process(pid_t pid, int fd[2], int *input_fd, t_cmd *current, \
+	t_shell *shell) 
 {
 	int status;
 
@@ -108,16 +98,16 @@ void exec_parent_process(pid_t pid, int fd[2], int *input_fd, t_cmd *current, t_
 	    current = current->next_cmd;
 }
 
-void ft_exec(t_shell *shell) 
+void ft_exec(t_shell *shell)
 {
 	t_cmd *current;
 	int input_fd;
 	pid_t pid;
+	int fd[2];
 
 	input_fd = 0;
-	current = shell->head;
+	current = get_last_cmd_first_node(shell);
 	while (current != NULL) {
-		int fd[2];
 		if (current->next_pipe != NULL)
 			create_pipe(fd);
 		pid = fork_process();
