@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_export.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Nathe <nsiefert@student.42.fr>             +#+  +:+       +#+        */
+/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/13 18:13:42 by Nathe             #+#    #+#             */
-/*   Updated: 2024/11/18 11:37:01 by Nathe            ###   ########.fr       */
+/*   Updated: 2024/11/30 16:37:11 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_export(t_shell *shell, t_cmd *cmd)
+int	ft_export(t_shell *master, t_cmd *cmd)
 {
 	t_list	*new;
 

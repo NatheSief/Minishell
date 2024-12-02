@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:06:00 by nate              #+#    #+#             */
-/*   Updated: 2024/11/18 11:45:14 by Nathe            ###   ########.fr       */
+/*   Updated: 2024/11/30 16:37:11 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_exec.h"
+#include "minishell.h"
 
-int ft_cd(t_shell *shell, t_cmd *cmd)
+int ft_cd(t_shell *master, t_cmd *cmd)
 {
 	char	*buf;
 

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: nate <nate@student.42.fr>                  +#+  +:+       +#+         #
+#    By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/19 20:58:55 by nsiefert          #+#    #+#              #
-#    Updated: 2024/11/18 20:18:08 by nate             ###   ########.fr        #
+#    Updated: 2024/11/25 12:38:48 by nsiefert         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -90,6 +90,7 @@ LIBFTSRC = 	ft_atoi.c	 			\
 			rmv_lst.c				\
 			ft_get_next_char.c		\
 			free_tab.c				\
+			ft_is_white_space.c		\
 
 # LIBFT
 SRC_LIBFT	= 	$(addprefix $(LIBFT), $(LIBFTSRC))

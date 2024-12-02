@@ -3,17 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/23 16:27:39 by nate              #+#    #+#             */
-/*   Updated: 2024/11/18 20:13:59 by nate             ###   ########.fr       */
+/*   Created: 2024/11/29 12:42:27 by nsiefert          #+#    #+#             */
+/*   Updated: 2024/12/02 11:07:17 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-//										INCLUDES
+/* ************************************************************************** */
+/*                              INCLUDES                                      */
+/* ************************************************************************** */
 
 # include <unistd.h>
 # include <stdio.h>
@@ -25,15 +27,27 @@
 # include <errno.h>
 # include <sys/wait.h>
 # include <signal.h>
+# include <limits.h>
+# include <sys/stat.h>
 # include "../libft/includes/libft.h"
 
-//										DEFINES
+/* ************************************************************************** */
+/*                               DEFINES                                      */
+/* ************************************************************************** */
 
-#define MAX_CMD_ARGS 10
-#define TEMP_FILE_TEMPLATE "/tmp/heredoc_XXXXXX"
+# define TEMP_FILE_TEMPLATE "/tmp/heredoc_XXXXXX"
+# define ERROR_MALLOC	1
+#define PATH_MAX        4096	/* FROM LIMITS.H*/
 
-//										ENUMS
+/* ************************************************************************** */
+/*                                ENUMS                                       */
+/* ************************************************************************** */
 
+//	Gestion de l'etat de mon shell pour gerer les signaux
+//	-----------------------------------------------------
+//	IDLE	==	Attente de commande
+//	HEREDOC	==	heredoc
+//	EXEC	==	Cmd execution
 typedef enum e_ms_state
 {
 	e_shell_idle,
@@ -41,68 +55,129 @@ typedef enum e_ms_state
 	e_shell_exec,
 } e_ms_state;
 
-typedef enum e_ms_token
-{
-	e_str,			// Chaine de caracteres
-	e_pipe,			// |
-	e_quote,			// '
-	e_d_quote,			// "
-	e_l_chevron,		// Redirection de l'entree de la commande
-	e_r_chevron,		// Redirection de la sortie de la commande en ecrasant
-	e_here_doc,		// Ouvre le here-doc
-	e_appen,			// Rajoute le contenu a la fin d'un fichier sans ecraser
-} e_ms_token;
+//	Gestion de mes tokens
+//	---------------------
+//	STR			==	String without anything particular	
+//	PIPE		==	Pipe in-between commands
+//	L_CHEVRON	==	Input redirection, should be after the arguments, I can have
+//						as much as I want to but I will only read the last one
+//	R_CHEVRON	==	Output redirection, should create the files if they don't
+//						exist, then only write in the last one
+//	HERE_DOC	==	Create a temporary file then write into it the content of
+//						the user here-doc. If multiple here-docs, you should
+//						exec them all but only read the last one (function as
+//						an input redirection)
+//	APPEN		==	Same as the here-doc but for the ouput, and also write at
+//						the end of the file, without over-writing in the file
 
-//										STRUCTURES
+# define INPUT 		1	//	"<"
+# define OUPUT 		2	//	">"
+# define HEREDOC 	3	//	"<<"
+# define APPEN 		4	//	">>"
+# define PIPE		5	//	"|"
+# define CMD		6	//	"string"
+# define ARGS		7	//	"string"
 
+/* ************************************************************************** */
+/*                              STRUCTURES                                    */
+/* ************************************************************************** */
+
+extern pid_t	g_signal_pid;
+
+//  Structure COMMAND :
+//      - cmd[3] is a char tab that contains :
+//          cmd[0] - the command
+//          cmd[1] - the options
+//          cmd[2] - the arguments (stacked in one string)
+//      - input contains the input fd
+//      - output contains the output fd
+//      - next_pipe is a pointer to the next command to exec after a pipe
 typedef struct s_cmd
 {
-	char			*cmd[3];
+	char			**cmd;
+	int				skipable;
 	int				input;
 	int				output;
 	struct s_cmd	*next_pipe;
-	struct s_cmd	*next_cmd;
 } t_cmd;
 
+typedef struct s_token
+{
+	int				type;
+	char        	*str;
+	struct s_token	*next_token;
+} t_token;
+
+//  Structure SHELL :
+//      - state is an enum that change in function of the shell state (cf enum)
+//      - env contains all the env variables
+//      - command is the head of the linked list of commands
+//      - ret_value is the return value of the commands that I can display with
+//          echo $?
 typedef struct s_shell
 {
 	e_ms_state state;
-	t_list	*env;
-	t_cmd	*head;
+	t_list	**env;
+    t_token	**token;
+	t_cmd	**command;
+	int		input_fd;
 	int		ret_value;
-	int		state; // Correspond au state de mon shell -> 1 lecture de commande, 2 heredoc et 3 exec
+	int		fd[2];
 } t_shell;
 
-//										PROTOTYPES
+/* ************************************************************************** */
+/*                              PROTOTYPES                                    */
+/* ************************************************************************** */
 
-//	BUILTINS
+//  INIT
 
-int ft_cd(t_shell *shell, t_cmd *cmd);
-int ft_echo(t_shell *shell, t_cmd *cmd);
-int ft_env(t_shell *shell);
-int ft_exit(t_shell *shell, t_cmd *cmd);
-int ft_export(t_shell *shell, t_cmd *cmd);
-int ft_pwd(t_shell *shell);
-int ft_unset(t_shell *shell, t_cmd *cmd);
+int 	init_new_cmd(t_shell *master, char **cmd, int infile, int outfile);
+int     init_shell(t_shell *master, char **envp);
 
-// T_CMD CMDS
+//  REDIRECTIONS
 
-t_cmd	*ft_cmdnew(char *content);
-void	ft_cmdadd_back(t_shell *shell, t_cmd *new);
-void	ft_create_new_cmd(t_shell *shell, t_cmd *new);
-t_cmd	*get_last_cmd_first_node(t_shell *shell);
-//	UTILS
+int		get_in(t_shell *data, t_token *tmp, t_cmd *cmd);
+int		get_out(t_token *tmp, t_cmd *cmd, t_shell *data);
 
-char	*get_env(t_shell *shell, char *name);
+//  SIGNALS
 
-//	SIGNAUX
+void    init_sig(t_shell *master);
 
-void	setup_signals(t_shell *shell);
+//  PARSING
 
-//	EXEC
+int ft_pars(t_shell *master, char *entry);
 
-pid_t	fork_process();
-void	create_pipe(int fd[2]);
-char	*get_cmd(t_shell *shell, t_cmd *cmd);
+//  EXEC
+
+int		ft_strslashjoin(char *dest, char *str, char *env, int *index);
+char	*find_cmd(t_shell *master, char *sample, t_list *env);
+int		here_doc(t_shell *master, char *word);
+int		is_builtin(char *str);
+void	child_process(t_shell *master, t_cmd *cmd, int *pip);
+int		launch_builtin(t_shell *master, t_cmd *cmd);
+int     ft_exec(t_shell *master);
+
+//	ERROR
+
+void	free_token(t_token	**token);
+void	free_cmd(t_cmd	**command);
+void	free_all(t_shell *master, char *err, int ext);
+
+//  UTILS
+
+int		ft_len_list(t_list *head);
+int     ft_go_next(char *str, char c, int pos);
+int     ft_go_next_non_white_space(char *str);
+
+//  BUILTINS
+
+int 	ft_cd(t_shell *master, t_cmd *cmd);
+int 	ft_echo(t_shell *master, t_cmd *cmd);
+int 	ft_env(t_shell *master);
+int 	ft_exit(t_shell *master, t_cmd *cmd);
+int 	ft_export(t_shell *master, t_cmd *cmd);
+int 	ft_pwd(t_shell *master);
+int 	ft_unset(t_shell *master, t_cmd *cmd);
+
 
 #endif
