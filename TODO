@@ -1,0 +1,59 @@
+Signaux :
+    ✔ Gerer Ctrl + C : @done(24-11-29 15:17)
+        ✔ Pendant l'idle @done(24-11-29 15:17)
+            -> Redisplay une nouvelle ligne en affichant ^C a la fin de la precedente
+        ✔ Pendant le here-doc @done(24-11-29 15:17)
+            -> Close le here-doc sans afficher ^C mais avec une ligne vide (pas d'entree sur la derniere)
+        ✔ Pendant l'execution des commandes @done(24-11-29 15:17)
+            -> Fait crash la commandes
+    ✔ Gerer Ctrl + D @done(24-11-29 15:17)
+        ✔ Pendant l'idle @done(24-11-29 15:17)
+            -> Exit le terminal actuel
+        ✔ Pendant le here-doc @done(24-11-29 15:17)
+            -> Fait crash le here-doc
+        ✔ Pendant l'execution @done(24-11-29 15:17)
+            -> Ne fait rien
+    ✔ Gerer le Ctrl + \ @done(24-11-29 15:17)
+        ✔ Pendant l'idle @done(24-11-29 15:17)
+            -> Ne fait rien
+        ✔ Pendant le here-doc @done(24-11-29 15:17)
+            -> Ne fait rien
+        ✔ Pendant l'exec @done(24-11-29 15:17)
+            -> Core-dump le programme en cours d'execution
+
+Parsing :
+    ☐ Checker les quotes, dquotes et pipes
+        -> Chaque quote ouvrante doit etre fermee
+        -> Chaque dquote ouvrante doit etre fermee
+        -> On ne doit ni commencer/finir par un pipe, et il doit y avoir quelque chose autre que des espaces vides entre les pipes
+    ☐ Decouper la string au niveau des pipes entre les commandes
+        -> Et travailler sur le decoupage de chaque commande separement pour les ajouter dans la structure
+    ☐ Faire les expands
+        -> Recuperer les values associees dans l'environmenet
+        -> Si l'expand est mauvais je rempli par ft_strdup("")
+    ☐ Recuperer les redirections
+        -> Ouvrir les fichiers et les creer si necessaire
+    ☐ Remplir les nodes de t_cmd
+        -> Envoyer a l'execution
+
+Exec :
+    ✔ Activer mes here-doc @done(24-12-02 08:51)
+        -> Creer mon fichier temporaire, lire les lignes et les envoyer dans le fichier temp et le fermer si Ctrl + C/D ou EndDelimiter
+    ✔ Fork si j'ai un execve pour executer ma commande @done(24-12-02 08:51)
+        -> Execve kill mon process parent donc je dois fork
+    ✔ Si j'ai juste un builtin sans pipe, je ne fork pas @done(24-12-02 08:51)
+        -> Sinon ca ne va rien changer a mon execution du code
+    ✔ Connecter les pipes de mes entrees/sorties @done(24-12-02 08:51)
+        -> Connecter ma sortie-1 a mon entree-2
+    ✔ Connecter mes entrees/sorties @done(24-12-02 08:51)
+        -> utiliser dup2() pour rediriger mon entree/sortie standard a mes redirections
+    ✔ Executer mes commandes @done(24-12-02 08:51)
+        -> Attendre les executions precedentes si j'ai besoin d'informations d'entree
+
+Fin d'exec :
+    ☐ Clear ma liste chainne de commandes
+        -> Preparer a l'ecoute de la commande suivante
+
+Fin du programme :
+    ☐ Clear la copie de l'environnement
+        -> ft_lstclear(master->env)

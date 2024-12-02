@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   free_tab.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/18 19:32:22 by nate              #+#    #+#             */
-/*   Updated: 2024/11/18 20:10:33 by nate             ###   ########.fr       */
+/*   Updated: 2024/11/25 14:12:17 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-//	Free a tab of char
+//	Free a char tab
 void	free_tab(char **tab)
 {
 	int	i;
@@ -20,5 +20,4 @@ void	free_tab(char **tab)
 	i = -1;
 	while (tab[++i])
 		free(tab[i]);
-	free(tab);
 }

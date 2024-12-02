@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 17:40:33 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/11/18 20:19:23 by nate             ###   ########.fr       */
+/*   Updated: 2024/11/25 12:39:23 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,9 +101,10 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 // -- Perso.h -- //
 
 int		ft_countchar(char *str, char c);
-void	*ft_realloc(void *ptr, int new_size);
-int		rmv_lst(t_list **head, void *content);
 int		ft_get_next_char(char *str, int id, char c);
+int		ft_is_white_space(char c);
+int		rmv_lst(t_list **head, void *content);
+void	*ft_realloc(void *ptr, int new_size);
 void	free_tab(char **tab);
 
 // -- Printf.h -- //
