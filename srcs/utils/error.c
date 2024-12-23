@@ -6,16 +6,11 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 23:58:47 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/02 09:45:16 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/23 19:58:13 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void    print_error(char *str)
-{
-    write(2, str, ft_strlen(str));
-}
 
 //	Free the token list, and also the strings associated to the tokens
 void	free_token(t_token	**token)
@@ -43,7 +38,7 @@ void	free_cmd(t_cmd	**command)
 	tmp = *command;
 	while(tmp)
 	{
-		free_tab(tmp->cmd);
+		free_tab((void **)tmp->cmd);
 		save = tmp;
 		tmp = tmp->next_pipe;
 		free(save);
@@ -54,17 +49,17 @@ void	free_cmd(t_cmd	**command)
 void	free_all(t_shell *master, char *err, int ext)
 {
 	if (master->command)
-		free_cmd(&master->command);
+		free_cmd(master->command);
 	if (master->token)
-		free_token(&master->token);
+		free_token(master->token);
 	if (master->env)
-		ft_lstclear(&master->env, free);
+		ft_lstclear(master->env, free);
 	if (master->fd[0] && master->fd[0] != -1)
 		close(master->fd[0]);
 	if (master->fd[1] && master->fd[1] != -1)
 		close(master->fd[1]);
 	if (err)
-		print_error(err);
+		ft_printf_fd(2, "%s", err);
 	rl_clear_history();
 	if (!access(".heredoc.tmp", F_OK))
 		unlink(".heredoc.tmp");

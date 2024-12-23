@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/09 14:06:00 by nate              #+#    #+#             */
-/*   Updated: 2024/11/30 16:37:11 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/20 16:09:14 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,27 @@
 int ft_cd(t_shell *master, t_cmd *cmd)
 {
 	char	*buf;
+	char	**tmp;
 
-	if (!chdir(cmd.cmd[2]))
+	if (check_opt(cmd->cmd[1], 0))
+		cmd->cmd[2] = ft_strjoin(cmd->cmd[1], cmd->cmd[2]);
+	tmp = ft_split(cmd->cmd[2], ' ');
+	if (!tmp)
+		return (1);
+	if (tmp[1])
+		return (printf("cd : too many arguments\n"));	
+	if (!chdir(tmp[0]))
 	{
-		buf = get_env(PATH);
+		buf = get_env("PWD", master);
 		if (!buf)
-			return (1);
-		change_env(shell, "OLD_PATH", buf);
-		change_env(shell, "PATH", cmd.cmd[2]);
-		free(buf);
+			return (free_tab(tmp), 1);
+		change_env(master, "OLD_PWD", buf);
+		change_env(master, "PWD", tmp[0]);
 	}
 	else
 	{
-		change_env(shell, "?", "1");
-		return (1);
+		master->ret_value = 1;
+		return (free_tab(tmp), 1);
 	}
-	return (0);
+	return (free_tab(tmp), 0);
 }

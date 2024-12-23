@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:57:37 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/01 20:23:05 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/23 14:19:28 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ static void sigint_handler(int sig, t_shell *master)
 {
     if (master->state == e_shell_idle)
     {
-        printf("\n");
+        printf("^C\n");
         rl_on_new_line();
         rl_replace_line("", 0);
         rl_redisplay();
@@ -31,10 +31,7 @@ static void sigint_handler(int sig, t_shell *master)
         rl_redisplay();
     }
     else if (master->state == e_shell_exec)
-    {
         printf("\nProgram interrupted by Ctrl-C\n");
-        // kill(pid, SIGINT); // Si j'ai garde le PID
-    }
 }
 
 //  Fonction pour gérer le signal SIGQUIT

@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:42:27 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/02 11:07:17 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/23 20:00:26 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 # include <signal.h>
 # include <limits.h>
 # include <sys/stat.h>
-# include "../libft/includes/libft.h"
+# include "../libft/include/libft.h"
 
 /* ************************************************************************** */
 /*                               DEFINES                                      */
@@ -37,7 +37,7 @@
 
 # define TEMP_FILE_TEMPLATE "/tmp/heredoc_XXXXXX"
 # define ERROR_MALLOC	1
-#define PATH_MAX        4096	/* FROM LIMITS.H*/
+# define PATH_MAX        4096	/* FROM LIMITS.H*/
 
 /* ************************************************************************** */
 /*                                ENUMS                                       */
@@ -71,12 +71,11 @@ typedef enum e_ms_state
 //						the end of the file, without over-writing in the file
 
 # define INPUT 		1	//	"<"
-# define OUPUT 		2	//	">"
+# define OUTPUT		2	//	">"
 # define HEREDOC 	3	//	"<<"
 # define APPEN 		4	//	">>"
 # define PIPE		5	//	"|"
-# define CMD		6	//	"string"
-# define ARGS		7	//	"string"
+# define STRING		6	//	"string"
 
 /* ************************************************************************** */
 /*                              STRUCTURES                                    */
@@ -94,7 +93,7 @@ extern pid_t	g_signal_pid;
 //      - next_pipe is a pointer to the next command to exec after a pipe
 typedef struct s_cmd
 {
-	char			**cmd;
+	char			*cmd[2];
 	int				skipable;
 	int				input;
 	int				output;
@@ -104,7 +103,7 @@ typedef struct s_cmd
 typedef struct s_token
 {
 	int				type;
-	char        	*str;
+	char			*str;
 	struct s_token	*next_token;
 } t_token;
 
@@ -116,37 +115,53 @@ typedef struct s_token
 //          echo $?
 typedef struct s_shell
 {
-	e_ms_state state;
-	t_list	**env;
-    t_token	**token;
-	t_cmd	**command;
-	int		input_fd;
-	int		ret_value;
-	int		fd[2];
+	e_ms_state		 state;
+	t_list			**env;
+    t_token			**token;
+	t_cmd			**command;
+	int				input_fd;
+	int				ret_value;
+	int				fd[2];
 } t_shell;
 
 /* ************************************************************************** */
 /*                              PROTOTYPES                                    */
 /* ************************************************************************** */
 
+//  ERROR
+
+int		print_error_token(t_shell *master, t_token *token);
+
 //  INIT
 
-int 	init_new_cmd(t_shell *master, char **cmd, int infile, int outfile);
-int     init_shell(t_shell *master, char **envp);
+t_cmd	*create_new_cmd(void);
+void	add_to_end_cmd(t_shell *master, t_cmd *cmd);
+
+int		init_shell(t_shell *master, char **envp);
 
 //  REDIRECTIONS
-
-int		get_in(t_shell *data, t_token *tmp, t_cmd *cmd);
-int		get_out(t_token *tmp, t_cmd *cmd, t_shell *data);
-
+int		get_in(t_shell *master, t_cmd *cmd, t_token *tmp);
+int		get_out(t_shell *master, t_cmd *cmd, t_token *tmp);
+int		get_output(t_shell *master, t_token *token, t_cmd *cmd);
+int		get_input(t_shell *master, t_token *token, t_cmd *cmd);
+void	redirect_in_out(t_cmd *cmd, int *fd);
 //  SIGNALS
 
-void    init_sig(t_shell *master);
+void	init_sig(t_shell *master);
 
 //  PARSING
 
-int ft_pars(t_shell *master, char *entry);
+void	ft_tknadd_back(t_token **head, t_token *to_add);
+char	**ft_ms_split(char *entry);
 
+int		check_cmd_struct(t_token *tkn, t_cmd *cmd);
+int		fill_cmd_struct(t_shell *master);
+int		check_token(t_shell *master);
+t_token	*ft_tknnew(void);
+int 	create_tkn_lst(t_shell *master, char **tab);
+int		skip_white_space(char *str, int i);
+int		ft_pars(t_shell *master, char *entry);
+int		tokenizator(t_shell *master, char *str);
 //  EXEC
 
 int		ft_strslashjoin(char *dest, char *str, char *env, int *index);
@@ -155,7 +170,7 @@ int		here_doc(t_shell *master, char *word);
 int		is_builtin(char *str);
 void	child_process(t_shell *master, t_cmd *cmd, int *pip);
 int		launch_builtin(t_shell *master, t_cmd *cmd);
-int     ft_exec(t_shell *master);
+int		ft_exec(t_shell *master);
 
 //	ERROR
 
@@ -166,18 +181,23 @@ void	free_all(t_shell *master, char *err, int ext);
 //  UTILS
 
 int		ft_len_list(t_list *head);
-int     ft_go_next(char *str, char c, int pos);
-int     ft_go_next_non_white_space(char *str);
+int		ft_go_next(char *str, char c, int pos);
+int		ft_go_next_non_white_space(char *str, int i);
+char	*get_env(char *str, t_shell *master);
+void	change_env(t_shell *master, char *field, char *value);
+int		add_env(t_shell *master, char *str);
+int		ft_len_cmd(t_cmd *head);
 
 //  BUILTINS
 
-int 	ft_cd(t_shell *master, t_cmd *cmd);
-int 	ft_echo(t_shell *master, t_cmd *cmd);
-int 	ft_env(t_shell *master);
-int 	ft_exit(t_shell *master, t_cmd *cmd);
-int 	ft_export(t_shell *master, t_cmd *cmd);
-int 	ft_pwd(t_shell *master);
-int 	ft_unset(t_shell *master, t_cmd *cmd);
+int		check_opt(char *lst_opt, char flag);
 
+int		ft_cd(t_shell *master, t_cmd *cmd);
+int		ft_echo(t_shell *master, t_cmd *cmd);
+int		ft_env(t_shell *master);
+int		ft_exit(t_shell *master, t_cmd *cmd);
+int		ft_export(t_shell *master, t_cmd *cmd);
+int		ft_pwd(t_shell *master);
+int		ft_unset(t_shell *master, t_cmd *cmd);
 
 #endif

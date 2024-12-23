@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 17:35:56 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/11/18 20:18:33 by nate             ###   ########.fr       */
+/*   Updated: 2023/12/19 20:35:06 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../include/libft.h"
 
 static size_t	ft_check_sign(char *str, long *nb)
 {
@@ -29,21 +29,21 @@ char	*ft_itoa(int n)
 {
 	size_t		i;
 	size_t		modulus;
-	short int	maiboyerlpb;
+	short int	rparodilpb;
 	char		str[13];
 	long		nb;
 
 	nb = n;
-	maiboyerlpb = 0;
+	rparodilpb = 0;
 	modulus = 1000000000;
 	ft_bzero(str, 13);
 	i = ft_check_sign(str, &nb);
 	while (modulus != 0)
 	{
-		if (nb / modulus != 0 || maiboyerlpb != 0)
+		if (nb / modulus != 0 || rparodilpb != 0)
 		{
 			str[i++] = (nb / modulus) + 48;
-			maiboyerlpb++;
+			rparodilpb++;
 		}
 		nb %= modulus;
 		modulus /= 10;

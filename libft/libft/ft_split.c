@@ -3,91 +3,97 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: nate <nate@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/25 17:38:42 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/11/18 20:18:33 by nate             ###   ########.fr       */
+/*   Updated: 2024/12/19 09:19:24 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../include/libft.h"
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: apuchill <apuchill@student.42sp.org.br>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/02/01 23:49:55 by apuchill          #+#    #+#             */
+/*   Updated: 2021/02/15 15:47:04 by apuchill         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+/*
+** LIBRARY: N/A
+** SYNOPSIS: split string, with specified character as delimiter, into an array
+**			of strings
+**
+** DESCRIPTION:
+** 		Allocates (with malloc(3)) and returns an array of strings obtained by
+**	splitting ’s’ using the character ’c’ as a delimiter. The array must be
+**	ended by a NULL pointer.
+*/
+
 #include "libft.h"
 
-static int	count_words(const char *str, char sep)
+static int	count_words(const char *str, char c)
 {
-	int	i;
-	int	count;
+	int i;
+	int trigger;
 
 	i = 0;
-	count = 0;
-	while (str[i])
+	trigger = 0;
+	while (*str)
 	{
-		while (str[i] == sep && str[i])
-			i++;
-		if (str[i] != sep && str[i])
+		if (*str != c && trigger == 0)
 		{
-			while (str[i] != sep && str[i])
-				i++;
-			count++;
+			trigger = 1;
+			i++;
 		}
+		else if (*str == c)
+			trigger = 0;
+		str++;
 	}
-	return (count);
+	return (i);
 }
 
-static char	*ft_strndup(const char *s, int j)
+static char	*word_dup(const char *str, int start, int finish)
 {
+	char	*word;
 	int		i;
-	char	*str;
 
 	i = 0;
-	str = (char *)malloc((j + 1));
-	if (!str)
-		return (NULL);
-	while (s[i] && i < j)
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
+	word = malloc((finish - start + 1) * sizeof(char));
+	while (start < finish)
+		word[i++] = str[start++];
+	word[i] = '\0';
+	return (word);
 }
 
-static char	**ext_w(char **words_array, const char *str, char sep, int size)
+char		**ft_split(char const *s, char c)
 {
-	int	i;
-	int	j;
+	size_t	i;
+	size_t	j;
+	int		index;
+	char	**split;
 
+	if (!s || !(split = malloc((count_words(s, c) + 1) * sizeof(char *))))
+		return (0);
 	i = 0;
 	j = 0;
-	while (j < size)
+	index = -1;
+	while (i <= ft_strlen(s))
 	{
-		while (str[i] == sep && str[i])
-			i++;
-		str = str + i;
-		i = 0;
-		while (str[i] != sep && str[i])
-			i++;
-		words_array[j++] = ft_strndup(str, i);
-		str = str + i;
-		i = 0;
+		if (s[i] != c && index < 0)
+			index = i;
+		else if ((s[i] == c || i == ft_strlen(s)) && index >= 0)
+		{
+			split[j++] = word_dup(s, index, i);
+			index = -1;
+		}
+		i++;
 	}
-	words_array[j] = 0;
-	return (words_array);
-}
-
-char	**ft_split(char const *source, char c)
-{
-	int		size;
-	char	**words_array;
-
-	size = count_words(source, c);
-	words_array = (char **)malloc(sizeof(char *) * (size + 1));
-	if (!words_array)
-		return (NULL);
-	if (size == 0)
-	{
-		words_array[0] = NULL;
-		return (words_array);
-	}
-	words_array = ext_w(words_array, source, c, size);
-	return (words_array);
+	split[j] = 0;
+	return (split);
 }

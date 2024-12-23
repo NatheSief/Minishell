@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 22:02:53 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/02 10:26:19 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/20 19:25:19 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,14 +99,14 @@ int	ft_exec(t_shell *master)
 
 	pip = master->fd;
 	tmp = master->command;
-	if (tmp && tmp->skipable == 0 && tmp->next_pipe == NULL && tmp->cmd[0] \
+	if (tmp && !tmp->skipable && !tmp->next_pipe && tmp->cmd[0] \
 		&& is_builtin(tmp->cmd[0]))
 		return (launch_builtin(master, tmp));
 	if (pipe(pip) == -1)
 		return (1);
 	exec_cmd(master, tmp, pip);
 	tmp = tmp->next_pipe;
-	while (tmp != master->command)
+	while (tmp != NULL)
 	{
 		if (pipe(pip) == -1)
 			return (-1);
