@@ -6,7 +6,7 @@
 #    By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/19 20:58:55 by nsiefert          #+#    #+#              #
-#    Updated: 2024/12/19 09:55:52 by nsiefert         ###   ########.fr        #
+#    Updated: 2024/12/24 15:22:09 by nsiefert         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -71,6 +71,7 @@ LIBFTSRC = 	ft_atoi.c	 				\
 			ft_putstr_fd.c 				\
 			ft_putendl_fd.c 			\
 			ft_putnbr_fd.c				\
+			rmv_lst.c					\
 
 LIBFTSRCB =	ft_lstnew.c 				\
 			ft_lstadd_front.c 			\

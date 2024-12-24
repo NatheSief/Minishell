@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:43:50 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/23 10:40:24 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:00:57 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static void	launch_shell(t_shell *master)
 		}
 		ft_exec(master);
 		free_cmd(master->command);
-		free_cmd(master->token);
+		free_token(master->token);
 	}
 }
 

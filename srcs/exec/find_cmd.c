@@ -6,20 +6,22 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 11:06:03 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/02 11:06:04 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:17:29 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_strslashjoin(char *dest, char *str, char *env, int *index)
+//	idx stands for index 
+int	ft_strslashjoin(char *dest, char *str, char *env, int *idx)
 {
 	int			i;
 	int			j;
 
 	i = -1;
-	while (index[++i] < (PATH_MAX - 1) && env[(index[i])] && env[(index[i])] != ':')
-		dest[i++] = env[index[i]];
+	(*idx)--;
+	while (++(*idx) < (PATH_MAX - 1) && env[(*idx)] && env[(*idx)] != ':')
+		dest[++i] = env[*idx];
 	i++;
 	dest[i++] = '/';
 	j = -1;
@@ -29,35 +31,20 @@ int	ft_strslashjoin(char *dest, char *str, char *env, int *index)
 	return (0);
 }
 
-static char	*create_paths(t_list *env, int len)
-{
-	t_list	*tmp;
-
-	tmp = env;
-	while (len--)
-	{
-		if (ft_strncmp((char *)tmp->content, "PATH=", 5) == 0)
-			return ((char *)(tmp->content) + 5);
-		tmp = tmp->next;
-	}
-	return (NULL);
-}
-
 static char	*cmd_not_found(char *sample)
 {
-	write(2, sample, ft_strlen(sample));
-	write(2, " : command not found\n", 21);
+	ft_printf_fd(2, "%s : command not found\n", sample);
 	return (NULL);
 }
 
-char	*find_cmd(t_shell *master, char *sample, t_list *env)
+char	*find_cmd(t_shell *master, char *sample)
 {
 	char		*paths;
 	char		path[PATH_MAX];
 	int			i;
 	int			len;
 
-	paths = create_paths(env, ft_len_list(env));
+	paths = get_env("PATH", master);
 	if (!paths || ft_strlen(sample) > PATH_MAX / 2)
 		return (cmd_not_found(sample));
 	i = 0;

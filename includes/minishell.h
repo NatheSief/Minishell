@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:42:27 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/23 20:00:26 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 17:19:08 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,8 @@
 /* ************************************************************************** */
 
 # define TEMP_FILE_TEMPLATE "/tmp/heredoc_XXXXXX"
-# define ERROR_MALLOC	1
-# define PATH_MAX        4096	/* FROM LIMITS.H*/
+# define ERROR_MALLOC		"Malloc error"
+# define PATH_MAX        	4096	/* FROM LIMITS.H*/
 
 /* ************************************************************************** */
 /*                                ENUMS                                       */
@@ -140,6 +140,7 @@ void	add_to_end_cmd(t_shell *master, t_cmd *cmd);
 int		init_shell(t_shell *master, char **envp);
 
 //  REDIRECTIONS
+
 int		get_in(t_shell *master, t_cmd *cmd, t_token *tmp);
 int		get_out(t_shell *master, t_cmd *cmd, t_token *tmp);
 int		get_output(t_shell *master, t_token *token, t_cmd *cmd);
@@ -164,8 +165,13 @@ int		ft_pars(t_shell *master, char *entry);
 int		tokenizator(t_shell *master, char *str);
 //  EXEC
 
-int		ft_strslashjoin(char *dest, char *str, char *env, int *index);
-char	*find_cmd(t_shell *master, char *sample, t_list *env);
+void	print_error(char *str);
+int		replace_dollar(t_shell *master, char *str);
+int	absolute_path(__attribute__((unused))t_shell *master, char *cmd, \
+	char **path);
+
+int		ft_strslashjoin(char *dest, char *str, char *env, int *idx);
+char	*find_cmd(t_shell *master, char *sample);
 int		here_doc(t_shell *master, char *word);
 int		is_builtin(char *str);
 void	child_process(t_shell *master, t_cmd *cmd, int *pip);
@@ -187,6 +193,9 @@ char	*get_env(char *str, t_shell *master);
 void	change_env(t_shell *master, char *field, char *value);
 int		add_env(t_shell *master, char *str);
 int		ft_len_cmd(t_cmd *head);
+t_token	*ft_tknnew(void);
+void	ft_tknadd_back(t_token **head, t_token *new);
+int		check_token(t_shell *master);
 
 //  BUILTINS
 

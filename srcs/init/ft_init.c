@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 13:09:32 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/01 20:24:31 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:01:51 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static t_list  **copy_env(char **envp)
 //  Check if I have an environment :
 //      If I have one, I will just copy it -- cf copy_env()
 //      If I don't, I will just create a new one -- cf create_minimal_env();
-static int  get_env(t_shell *master, char **envp)
+static int  _get_env(t_shell *master, char **envp)
 {
     if (envp == NULL)
         return (1);
@@ -71,7 +71,7 @@ int init_shell(t_shell *master, char **envp)
     master->fd[1] = -1;                     //  Put that to -1 it's easier
     g_signal_pid = 0;                       //  Put the global to 0
     init_sig(master);                       //  Init the signals for the entierty of the execution
-    if (get_env(master, envp))              //  We will copy the environment variables into the shell struct
+    if (_get_env(master, envp))              //  We will copy the environment variables into the shell struct
         return (1);
     return (0);
 }

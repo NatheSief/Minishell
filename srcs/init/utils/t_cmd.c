@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 20:19:33 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/23 18:50:19 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:01:20 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void    add_to_end_cmd(t_shell *master, t_cmd *cmd)
 {
     t_cmd *tmp;
 
-    tmp = master->command;
+    tmp = *master->command;
     while (tmp->next_pipe)
         tmp = tmp->next_pipe;
     tmp->next_pipe = cmd;

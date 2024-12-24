@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 22:02:53 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/20 19:25:19 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:51:35 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	is_builtin(char *cmd)
 }
 
 //	Connect the input/output of the commands together
-static void	parent_process(t_shell *master, t_cmd *cmd, int *pip)
+static void	parent_process(t_cmd *cmd, int *pip)
 {
 	close(pip[1]);
 	if (cmd->input >= 0)
@@ -57,13 +57,13 @@ static int	exec_cmd(t_shell *master, t_cmd *cmd, int *pip)
 		return (free_all(master, "PID ERROR", 1), 1);
 	else if (g_signal_pid == 0)
 	{
-		if (cmd->cmd && cmd->cmd[0])
+		if (cmd->cmd[0])
 			child_process(master, cmd, pip);
 		else
 			free_all(master, NULL, 0);
 	}
 	else
-		parent_process(master, cmd, pip);
+		parent_process(cmd, pip);
 	return (0);
 }
 
@@ -74,7 +74,7 @@ static void	wait_all(t_shell *master)
 	int		len;
 	t_cmd	*tmp;
 
-	tmp = master->command;
+	tmp = *master->command;
 	len = ft_len_cmd(tmp);
 	while (len--)
 	{
@@ -98,7 +98,7 @@ int	ft_exec(t_shell *master)
 	int		*pip;
 
 	pip = master->fd;
-	tmp = master->command;
+	tmp = *master->command;
 	if (tmp && !tmp->skipable && !tmp->next_pipe && tmp->cmd[0] \
 		&& is_builtin(tmp->cmd[0]))
 		return (launch_builtin(master, tmp));

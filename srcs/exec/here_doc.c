@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 00:21:06 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/02 00:21:08 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:24:41 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,9 @@ static int	read_in_stdin(t_shell *master, int fd, char *word)
 		}
 		if (!ft_strncmp(word, buf, INT_MAX))
 			break ;
-		if (!replace_dollar(&buf, master))
+		if (replace_dollar(master, buf))
 			free_all(master, "MALLOC ERROR", 1);
-		write(fd, buf, ft_strlen(buf));
-		write(fd, "\n", 1);
+		ft_printf_fd(fd, "%s\n", buf);
 		free(buf);
 	}
 	free(buf);

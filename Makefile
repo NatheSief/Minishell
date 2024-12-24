@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/05/01 00:41:08 by inf1n1ty          #+#    #+#              #
-#    Updated: 2024/12/20 20:38:47 by nsiefert         ###   ########.fr        #
+#    Created: 2024/12/24 16:37:36 by nsiefert          #+#    #+#              #
+#    Updated: 2024/12/24 17:17:08 by nsiefert         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,15 +15,17 @@ NAME            := minishell
 PROJECT_NAME    := minishell
 
 # =========================== COMPILER AND FLAGS ============================= #
-CC              := gcc
-CFLAGS          := -Wall -Wextra -Werror -g3 -O2 -fno-builtin -I includes/
-DEPFLAGS        := -MMD -MP
+CC              :=	cc
+CFLAGS          :=	-Wall -Wextra -Werror -g3 -I includes/
+DEPFLAGS        :=	-MMD -MP
+LIBS_FLAGS		:=	-lft
 
 # ================================= ALIASES ================================== #
 SRCS_PATH       = srcs/
+INCL_PATH       = srcs/
 OBJS_PATH       = obj/
 
-LIBFT_PATH      = libft/
+LIBFT_PATH      = libft
 
 RM = rm -rf
 
@@ -36,7 +38,6 @@ SAVE_CURS_POS   := \033[s
 LOAD_CURS_SAVE  := \033[u
 BOLD            := \033[1m
 BLINK           := \033[5m
-
 
 # reset
 NC              := \033[0m
@@ -70,7 +71,7 @@ WHITE_BG        := \033[48;5;15m
 
 # ================================ SRC FILES ================================= #
 # Use find to include all .c files in subdirectories
-SRCS            := $(shell find $(SRCS_PATH) -name "*.c")
+SRCS			:= $(shell find $(SRCS_PATH) -name "*.c")
 
 # ================================ OBJ FILES ================================= #
 # The object files will go to the 'obj' directory
@@ -84,19 +85,19 @@ DEPS            := $(OBJS:.o=.d)
 
 # Rule to create the object files in the 'obj' folder
 $(OBJS_PATH)%.o: $(SRCS_PATH)%.c
-	@mkdir -p $(OBJS_PATH)/$(dir $*)  # Ensure the 'obj/redirections' directory exists
-	@$(CC) $(CFLAGS) $(DEPFLAGS) -c $< -o $@  # Compile each .c file into .o
-	@$(eval FILE_COUNT=$(shell echo $$(($(FILE_COUNT)+1))))  # Increment the file count
-	@$(eval PERCENT:=$(shell echo $$((100*$(FILE_COUNT)/$(TOTAL)))))  # Calculate progress percentage
-	@$(eval BAR_PROGRESS=$(shell echo $$(($(BAR_SIZE)*$(FILE_COUNT)/$(TOTAL)))))  # Calculate progress bar length
-	@$(eval GRAD_G_PROG=$(shell echo $$(($(GRAD_G_SIZE)*$(FILE_COUNT)/$(TOTAL) + 1))))  # Gradient calculation for bar
-	@printf "\t"  # Printing bar header
+	@mkdir -p $(OBJS_PATH)/$(dir $*)
+	@$(CC) $(CFLAGS) $(DEPFLAGS) -c $< -o $@
+	@$(eval FILE_COUNT=$(shell echo $$(($(FILE_COUNT)+1))))
+	@$(eval PERCENT:=$(shell echo $$((100*$(FILE_COUNT)/$(TOTAL)))))
+	@$(eval BAR_PROGRESS=$(shell echo $$(($(BAR_SIZE)*$(FILE_COUNT)/$(TOTAL)))))
+	@$(eval GRAD_G_PROG=$(shell echo $$(($(GRAD_G_SIZE)*$(FILE_COUNT)/$(TOTAL) + 1))))
+	@printf "\t"
 	@for N in $$(seq 1 $(shell echo $$(($(BAR_SIZE) + 2)))); do \
 		echo -n █; \
 	done
 	@printf "\r"
 	@printf "\t$(A_BLACK)$(BOLD)$(WHITE_BG) Compiling: $@%*s...$(NC)\n"
-	@printf "\t█$(call GET_G_GRADIENT, $(GRAD_G_PROG))"  # Display gradient on progress bar
+	@printf "\t█$(call GET_G_GRADIENT, $(GRAD_G_PROG))"
 	@for N in $$(seq 1 $(BAR_PROGRESS)); do \
 		echo -n █; \
 	done
@@ -107,8 +108,8 @@ $(OBJS_PATH)%.o: $(SRCS_PATH)%.c
 	@for N in $$(seq 1 $(shell echo $$(($(BAR_SIZE) + 2)))); do \
 		echo -n ▀; \
 	done
-	@printf "$(CURS_UP)$(CURS_UP)"  # Move cursor up
-	@printf "\b\b\b\b\b$(A_BLACK)$(WHITE_BG)$(BOLD)%3d%%$(NC)\r"  # Display completion percentage
+	@printf "$(CURS_UP)$(CURS_UP)"
+	@printf "\b\b\b\b\b$(A_BLACK)$(WHITE_BG)$(BOLD)%3d%%$(NC)\r" $(PERCENT)
 
 # counting files vars
 TOTAL           := $(words $(SRCS))
@@ -162,14 +163,13 @@ $(NAME): libft $(OBJS)
 	@printf "$(LOAD_CURS_SAVE)$(NC)█$(CURS_UP)"
 	@printf "\b\b\b\b\b$(A_BLACK)$(WHITE_BG)$(BOLD)%3d%%$(NC)\r" $(PERCENT)
 	@echo "\n\n\n[🌀] $(BGREEN)$(PROJECT_NAME) Ready to run$(NC)\n"
-	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
+	@$(CC) $(FLAG) -o $(NAME) $(OBJS) -I$(INCL_PATH) -lreadline -L$(LIBFT_PATH) -lft
 	@printf "[✨] $(BCYAN)[%2d/%2d]\t$(BWHITE)All files have been compiled ✔️$(NC)\n" $(FILE_COUNT) $(TOTAL)
 
 -include $(DEPS)
 
 libft :
-	@cd $(LIBFT_PATH)
-	@make
+	$(MAKE) -s -C $(LIBFT_PATH)
 
 clean:
 	@printf "$(PURPLE)"
@@ -187,4 +187,4 @@ fclean: clean
 
 re: clean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re libft

@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:57:37 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/23 14:19:28 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 15:15:19 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 // Fonction pour gérer le signal SIGINT
 static void sigint_handler(int sig, t_shell *master)
 {
+    (void)sig;
     if (master->state == e_shell_idle)
     {
         printf("^C\n");
@@ -37,6 +38,7 @@ static void sigint_handler(int sig, t_shell *master)
 //  Fonction pour gérer le signal SIGQUIT
 static void sigquit_handler(int sig, t_shell *master)
 {
+    (void)sig;
     if (master->state == e_shell_exec)
     {
         printf("Quit (core dumped)\n");
@@ -49,6 +51,7 @@ static void sigquit_handler(int sig, t_shell *master)
 //      SIGQUIT ==  Ctrl-'\'
 void    init_sig(t_shell *master)
 {
+    (void)master;
     signal(SIGINT, (void (*)(int))sigint_handler);
     signal(SIGQUIT, (void (*)(int))sigquit_handler);
 }
