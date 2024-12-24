@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:43:50 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/24 13:00:57 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 17:48:04 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,11 @@ static void	launch_shell(t_shell *master)
 	{
 		master->state = e_shell_idle;
 		str = readline("->");
+		printf("|%s|\n\n", str);
 		if (str == NULL)
 			break ;
+		if (!ft_strcmp(str, ""))
+			continue ;
 		add_history(str);
 		if (ft_pars(master, str))
 		{

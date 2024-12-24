@@ -6,7 +6,7 @@
 /*   By: nsiefert <nsiefert@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 13:09:32 by nsiefert          #+#    #+#             */
-/*   Updated: 2024/12/24 13:01:51 by nsiefert         ###   ########.fr       */
+/*   Updated: 2024/12/24 17:34:43 by nsiefert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static t_list  **copy_env(char **envp)
     char    *duplicated;
 
     i = 0;
-    head = NULL;
+    head = malloc(sizeof(t_list *));
     duplicated = ft_strdup(envp[0]);
     if (!duplicated)
         return (NULL);
@@ -62,16 +62,16 @@ static int  _get_env(t_shell *master, char **envp)
 
 int init_shell(t_shell *master, char **envp)
 {
-    master->ret_value = 0;                  //  The return value is 0 before the execution
-    master->state = e_shell_idle;           //  We are waiting for a command
-    master->command = NULL;                 //  There is no command at start
-    master->token = NULL;                   //  There is no token at start
-    master->input_fd = -1;                  //  Put that to -1 it's easier
-    master->fd[0] = -1;                     //  Put that to -1 it's easier
-    master->fd[1] = -1;                     //  Put that to -1 it's easier
-    g_signal_pid = 0;                       //  Put the global to 0
-    init_sig(master);                       //  Init the signals for the entierty of the execution
-    if (_get_env(master, envp))              //  We will copy the environment variables into the shell struct
+    master->ret_value = 0;
+    master->state = e_shell_idle;
+    master->command = NULL;
+    master->token = NULL;
+    master->input_fd = -1;
+    master->fd[0] = -1;
+    master->fd[1] = -1;
+    g_signal_pid = 0;
+    init_sig(master);
+    if (_get_env(master, envp))
         return (1);
     return (0);
 }
